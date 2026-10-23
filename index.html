@@ -5,10 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>CC Finds</title>
-
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
-
     <style>
         /* Cada variável vira uma chave da aba Config */
         :root {
@@ -1121,7 +1119,7 @@
         }
 
         .cc:hover {
-            transform: translateY(-5px)
+            transform: translateY(-3px)
         }
 
         .cc .th {
@@ -1130,7 +1128,7 @@
         }
 
         .cc:hover .th {
-            box-shadow: 0 14px 26px rgba(0, 0, 0, .28)
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .2)
         }
 
         .cc .th::before {
@@ -1139,10 +1137,6 @@
             inset: 0;
             background: inherit;
             transition: transform .5s cubic-bezier(.2, .8, .2, 1)
-        }
-
-        .cc:hover .th::before {
-            transform: scale(1.08)
         }
 
         .cc .tag {
@@ -1306,10 +1300,6 @@
             transition: transform .3s
         }
 
-        .ac:hover .av {
-            transform: scale(1.07)
-        }
-
         .fit {
             position: relative;
             overflow: hidden
@@ -1354,7 +1344,7 @@
         .nv:hover {
             background: var(--acc);
             color: var(--onacc);
-            transform: translateY(-50%) scale(1.1)
+            transform: translateY(-50%)
         }
 
         .thumbs div {
@@ -1538,9 +1528,9 @@
 
         .thumbs div:hover {
             opacity: 1;
-            transform: translateY(-4px) scale(1.04);
+            transform: translateY(-3px);
             border-color: color-mix(in srgb, var(--acc) 55%, transparent);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, .3)
+            box-shadow: 0 8px 16px rgba(0, 0, 0, .22)
         }
 
         .thumbs div.on {
@@ -1567,10 +1557,6 @@
             transition: opacity .15s, transform .7s cubic-bezier(.2, .8, .2, 1)
         }
 
-        .gal:hover::after {
-            transform: scale(1.025)
-        }
-
         .cc .th::after {
             content: "";
             position: absolute;
@@ -1582,6 +1568,140 @@
 
         .cc:hover .th::after {
             opacity: 1
+        }
+
+        :root {
+            --ln2: color-mix(in srgb, var(--line) 45%, transparent)
+        }
+
+        :root[data-theme="dark"] {
+            --ln2: rgba(255, 255, 255, .055)
+        }
+
+        .card,
+        .st,
+        .sr,
+        .ic,
+        .ddb,
+        .ddp,
+        .toast {
+            border-color: var(--ln2)
+        }
+
+        .side {
+            border-right-color: var(--ln2)
+        }
+
+        .ft {
+            border-top-color: var(--ln2)
+        }
+
+        .kv {
+            border-bottom-color: var(--ln2)
+        }
+
+        .ban {
+            border-color: transparent
+        }
+
+        .pills span {
+            border-color: transparent
+        }
+
+        :root[data-theme="dark"] .card {
+            box-shadow: none
+        }
+
+        .top a {
+            position: relative;
+            padding: 8px 16px
+        }
+
+        .top a.on,
+        .top a:hover {
+            background: none;
+            box-shadow: none
+        }
+
+        .top a.on {
+            color: var(--tx)
+        }
+
+        .top a:hover {
+            color: var(--acc)
+        }
+
+        .top a::after {
+            content: "";
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 1px;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--acc), var(--acc2));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .35s cubic-bezier(.2, .8, .2, 1)
+        }
+
+        .top a:hover::after {
+            transform: scaleX(.45)
+        }
+
+        .top a.on::after {
+            transform: scaleX(1);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--acc) 55%, transparent)
+        }
+
+        .about {
+            display: grid;
+            grid-template-columns: minmax(220px, 340px) 1fr;
+            gap: 36px;
+            align-items: center;
+            padding: 6px
+        }
+
+        .about.rev {
+            grid-template-columns: 1fr minmax(220px, 340px)
+        }
+
+        .about.rev .abimg {
+            order: 2
+        }
+
+        .about.solo {
+            grid-template-columns: 1fr
+        }
+
+        .abimg {
+            aspect-ratio: 4/5;
+            border-radius: 22px;
+            background: var(--card2)
+        }
+
+        .abtx h2 {
+            font-size: 34px;
+            margin-bottom: 12px
+        }
+
+        .abtx p {
+            margin: 0;
+            white-space: pre-wrap;
+            line-height: 1.75;
+            font-size: 16px
+        }
+
+        @media(max-width:800px) {
+
+            .about,
+            .about.rev {
+                grid-template-columns: 1fr
+            }
+
+            .about.rev .abimg {
+                order: 0
+            }
         }
     </style>
 </head>
@@ -1695,7 +1815,10 @@
         }
         const links = q => lista(q, S.LK, 'links', 'sites', '', D => `<div class="two">${D.map(l => `<a class="row" href="${esc(l.url)}" target="_blank" rel="noopener"><div class="m ib">${ic(l.icone || 'external-link')}</div><div><b>${esc(l.nome)}</b><small>${esc(l.descricao)}</small></div></a>`).join('')}</div>`);
         const tutoriais = q => lista(q, S.TU, 'tutoriais', 'tutoriais', '', D => D.map(t => { const hd = `<div class="m ib">${ic(t.icone || 'book')}</div><div><b>${esc(t.titulo)}</b><small>${esc(t.descricao)}</small></div>`; return t.url ? `<a class="acc" href="${esc(t.url)}" target="_blank" rel="noopener"><div class="acch">${hd}${ic('external-link')}</div></a>` : `<div class="acc"><button type="button" class="acch" aria-expanded="false">${hd}${ic('chevron-down')}</button><div class="accb"><div><p>${esc(t.texto)}</p></div></div></div>` }).join(''));
-        const sobre = () => mg(0, banner({ t: S.c.titulo_sobre, img: S.c.banner_sobre }), `<section class="card" style="grid-column:1/-1"><p style="margin:0;white-space:pre-wrap">${esc(S.c.texto_sobre)}</p></section>`);
+        const sobre = () => {
+            const c = S.c, im = c.imagem_sobre ? img(c.imagem_sobre) : '', r = String(c.sobre_imagem_lado || 'esquerda').toLowerCase() === 'direita';
+            return mg(0, banner({ t: c.titulo_sobre, img: c.banner_sobre, luma: lm('em_sobre') }), `<section class="card" style="grid-column:1/-1"><div class="about${r ? ' rev' : ''}${im ? '' : ' solo'}">${im ? `<div class="abimg fit" style="--img:url(&quot;${esc(im)}&quot;)"></div>` : ''}<div class="abtx">${c.sobre_nome ? `<h2>${esc(c.sobre_nome)}</h2>` : ''}<p>${esc(c.texto_sobre)}</p></div></div></section>`)
+        }
         function side() {
             const c = S.c; $('#side').innerHTML = `<div class="logo"><b>${c.logo_img ? `<img src="${esc(img(c.logo_img))}" alt="" style="width:26px;height:26px">` : '<i></i>'}${esc(c.nome_site)}</b><small>${esc(c.subtitulo_site)}</small></div><a href="#/" data-k="home">${ic('home')}Início</a><h4>Categorias</h4>${tx('categoria').map(t => `<a href="#/explorar?cat=${encodeURIComponent(t.nome)}" data-k="${esc(t.nome)}">${ic(t.icone || 'folder')}${esc(t.nome)}<em>${S.posts.filter(p => p.categoria === t.nome).length}</em></a>`).join('')}`;
             $('#ft').innerHTML = `<span>${esc(c.texto_rodape)}</span><a class="r" href="#/sobre">Sobre</a>`; document.title = c.nome_site
