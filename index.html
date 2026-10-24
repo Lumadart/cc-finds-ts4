@@ -1124,7 +1124,7 @@
 
         .cc .th {
             overflow: hidden;
-            transition: box-shadow .25s
+            transition: box-shadow .4s ease
         }
 
         .cc:hover .th {
@@ -1144,7 +1144,7 @@
         }
 
         .cc h3 {
-            transition: color .2s
+            transition: color .3s
         }
 
         .cc:hover h3 {
@@ -1703,6 +1703,25 @@
                 order: 0
             }
         }
+
+        .chips a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .chips a svg {
+            width: 15px;
+            height: 15px
+        }
+
+        .ban:not(.nl) p {
+            max-width: min(720px, calc(100% - 380px))
+        }
+
+        .ban.nl p {
+            max-width: 900px
+        }
     </style>
 </head>
 
@@ -1746,7 +1765,7 @@
             const c = { ...DEF }; r.Config.forEach(x => { if (x.chave && !x.chave.startsWith('---') && x.valor !== '') c[x.chave] = x.valor });
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const posts = r.Posts.filter(p => p.status === 'Publicado').map(p => { p.imgs = split(p.imagens, '|').map(img); p.cover = img(p.capa) || p.imgs[0] || ''; p.tg = split(p.tags, ','); p.dt = pd(p.data_postagem) || new Date(0); const dp = pd(p.data_publica); p.dp = dp; p.early = p.acesso === 'Acesso antecipado' && dp && dp > today; p.members = p.acesso === 'Apenas membros'; p.days = p.early ? Math.ceil((dp - today) / 864e5) : 0; p.dls = [1, 2, 3].map(i => ({ l: p['link' + i + '_rotulo'] || 'Download', u: p['link' + i + '_url'] })).filter(x => x.u); return p }).sort((a, b) => b.dt - a.dt);
-            S = { c, posts, A: r.Autores, T: r.Taxonomia, LK: r.Links, CH: r.Cheats, TU: r.Tutoriais, today }
+            const oo = (a, b) => (+a.ordem || 999) - (+b.ordem || 999); S = { c, posts, A: r.Autores, T: r.Taxonomia, LK: r.Links.sort(oo), CH: r.Cheats.sort(oo), TU: r.Tutoriais.sort(oo), today }
         }
         const tx = t => S.T.filter(x => x.tipo === t).sort((a, b) => (+a.ordem || 99) - (+b.ordem || 99));
         const acc = p => p.early ? 'Acesso antecipado' : p.members ? 'Apenas membros' : 'Gratuito';
@@ -1772,16 +1791,16 @@
             return mg(0, banner({ t: S.c.titulo_home, p: S.c.texto_home, pills: [`<b>${P.length}</b> CCs`, `<b>${S.A.length}</b> autores`, `<b>${nov}</b> novos`], img: S.c.banner_home, luma: lm('na_home') }), `<section class="card"><div class="hd"><h2>Últimos CCs</h2><a href="#/explorar">Ver todos</a></div>${chipsT([['Recentes', '#/?t=r', t === 'r'], ['Destaques', '#/?t=d', t === 'd'], ['Antecipado', '#/?t=a', t === 'a']])}${grid(L.slice(0, 8))}</section>`, `<aside class="sd">${tagsCard()}${favCard()}${autCard()}</aside>`)
         }
         function explorar(q) {
-            const g = k => q.get(k) || '', cat = g('cat'), sub = g('sub');
-            let L = S.posts.filter(p => (!cat || p.categoria === cat) && (!sub || p.subcategoria === sub) && (!g('autor') || p.autor === g('autor')) && (!g('tag') || p.tg.includes(g('tag'))) && (!g('acesso') || acc(p) === g('acesso')) && (!g('q') || (p.titulo + ' ' + p.autor + ' ' + p.tags + ' ' + p.categoria + ' ' + p.subcategoria).toLowerCase().includes(g('q').toLowerCase())));
-            if (g('o') === 'az') L.sort((a, b) => a.titulo.localeCompare(b.titulo));
+            const g = k => q.get(k) || '', cat = g('cat'), sub = g('sub'), tg = q.getAll('tag');
+            let L = S.posts.filter(p => (!cat || p.categoria === cat) && (!sub || p.subcategoria === sub) && (!g('autor') || p.autor === g('autor')) && tg.every(t => p.tg.includes(t)) && (!g('acesso') || acc(p) === g('acesso')) && (!g('q') || (p.titulo + ' ' + p.autor + ' ' + p.tags + ' ' + p.categoria + ' ' + p.subcategoria).toLowerCase().includes(g('q').toLowerCase())));
+            if (g('o') === 'az' || g('o') === 'za') L.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR') * (g('o') === 'za' ? -1 : 1));
             const n = +S.c.itens_por_pagina || 12, pg = Math.max(1, +g('p') || 1), pages = Math.ceil(L.length / n) || 1;
             const lk = (k, v) => { const u = new URLSearchParams(q); if (v == null || u.get(k) === v) u.delete(k); else u.set(k, v); if (k !== 'p') u.delete('p'); if (k === 'cat') u.delete('sub'); return '#/explorar?' + u };
-            const ch = (l, k, v) => [l, lk(k, v), g(k) === v];
+            const ch = (l, k, v) => [l, lk(k, v), g(k) === v], tgl = v => { const u = new URLSearchParams(q), a = u.getAll('tag'); u.delete('tag'); (a.includes(v) ? a.filter(x => x !== v) : a.concat(v)).forEach(x => u.append('tag', x)); u.delete('p'); return '#/explorar?' + u };
             const ct = tx('categoria').find(c => c.nome === cat), sb = tx('subcategoria').find(c => c.nome === sub && c.pai === cat);
             const bi = (sb && sb.banner_img) || (ct && ct.banner_img) || S.c.banner_explorar;
-            const side = `<div class="card"><div class="hd"><h2>Filtros</h2></div><small class="lb">Tags</small>${chipsT(tx('tag').map(t => ch(t.nome, 'tag', t.nome)))}<small class="lb">Categoria</small>${chipsT(tx('categoria').map(c => ch(c.nome, 'cat', c.nome)))}${cat ? `<small class="lb">Subcategoria</small>${chipsT(tx('subcategoria').filter(s => s.pai === cat).map(s => ch(s.nome, 'sub', s.nome)))}` : ''}<small class="lb">Autor</small><div class="dd"><button type="button" class="ddb"><span>${esc(g('autor') || 'Todos')}</span>${ic('chevron-down')}</button><div class="ddp"><a href="${lk('autor', null)}" class="${g('autor') ? '' : 'on'}">Todos</a>${S.A.map(a => `<a href="${lk('autor', a.nome)}" class="${g('autor') === a.nome ? 'on' : ''}">${esc(a.nome)}</a>`).join('')}</div></div><small class="lb">Acesso</small>${chipsT(['Gratuito', 'Acesso antecipado', 'Apenas membros'].map(x => ch(x, 'acesso', x)))}</div>`;
-            return mg(1, banner({ t: sub || cat || S.c.titulo_explorar, p: cat ? '' : S.c.texto_explorar, pills: [`<b>${L.length}</b> resultados`], img: bi, luma: cat ? lm('em_categoria') : lm('em_explorar') }), `<section class="card"><div class="hd"><h2>Resultados</h2>${chipsT([ch('A–Z', 'o', 'az')])}</div>${grid(L.slice((pg - 1) * n, pg * n))}${pages > 1 ? `<div class="pg-n">${Array.from({ length: pages }, (_, i) => `<a class="${pg === i + 1 ? 'on' : ''}" href="${lk('p', String(i + 1))}">${i + 1}</a>`).join('')}</div>` : ''}</section>`, `<aside class="sd">${side}</aside>`)
+            const side = `<div class="card"><div class="hd"><h2>Filtros</h2></div><small class="lb">Tags</small>${chipsT(tx('tag').map(t => [t.nome, tgl(t.nome), tg.includes(t.nome)]))}<small class="lb">Categoria</small>${chipsT(tx('categoria').map(c => ch(c.nome, 'cat', c.nome)))}${cat ? `<small class="lb">Subcategoria</small>${chipsT(tx('subcategoria').filter(s => s.pai === cat).map(s => ch(s.nome, 'sub', s.nome)))}` : ''}<small class="lb">Autor</small><div class="dd"><button type="button" class="ddb"><span>${esc(g('autor') || 'Todos')}</span>${ic('chevron-down')}</button><div class="ddp"><a href="${lk('autor', null)}" class="${g('autor') ? '' : 'on'}">Todos</a>${S.A.map(a => `<a href="${lk('autor', a.nome)}" class="${g('autor') === a.nome ? 'on' : ''}">${esc(a.nome)}</a>`).join('')}</div></div><small class="lb">Acesso</small>${chipsT(['Gratuito', 'Acesso antecipado', 'Apenas membros'].map(x => ch(x, 'acesso', x)))}</div>`;
+            return mg(1, banner({ t: (sb && sb.titulo_pagina) || sub || (ct && ct.titulo_pagina) || cat || S.c.titulo_explorar, p: (sb && sb.texto_pagina) || (ct && ct.texto_pagina) || (cat ? '' : S.c.texto_explorar), pills: [`<b>${L.length}</b> resultados`], img: bi, luma: cat ? lm('em_categoria') : lm('em_explorar') }), `<section class="card"><div class="hd"><h2>Resultados</h2><div class="chips"><a class="${['az', 'za'].includes(g('o')) ? '' : 'on'}" href="${lk('o', null)}">${ic('clock')}Recentes</a><a class="${g('o') === 'az' ? 'on' : ''}" href="${lk('o', 'az')}">${ic('arrow-down-a-z')}A–Z</a><a class="${g('o') === 'za' ? 'on' : ''}" href="${lk('o', 'za')}">${ic('arrow-down-z-a')}Z–A</a></div></div>${grid(L.slice((pg - 1) * n, pg * n))}${pages > 1 ? `<div class="pg-n">${Array.from({ length: pages }, (_, i) => `<a class="${pg === i + 1 ? 'on' : ''}" href="${lk('p', String(i + 1))}">${i + 1}</a>`).join('')}</div>` : ''}</section>`, `<aside class="sd">${side}</aside>`)
         }
         function gal(i, now) { const n = GL.im.length; if (!n) return; GL.i = (i + n) % n; const m = $('#gal'), set = () => { m.style.setProperty('--img', 'url("' + GL.im[GL.i] + '")'); m.classList.remove('sw') }; now ? set() : (m.classList.add('sw'), setTimeout(set, 150)); $('#cnt').textContent = `${GL.i + 1} / ${n}`; document.querySelectorAll('#thumbs div').forEach((t, k) => t.classList.toggle('on', k === GL.i)) }
         const nf = () => mg(0, '', `<section class="card" style="grid-column:1/-1;text-align:center;padding:50px">${S.c.luma_surpresa ? `<img src="${esc(img(S.c.luma_surpresa))}" alt="" style="height:160px"><br>` : ''}<h2>Não achei nada por aqui…</h2><p><a href="#/" style="color:var(--acc);font-weight:700">Voltar ao início</a></p></section>`);
@@ -1827,7 +1846,7 @@
             const c = S.c; let s = ['claro', 'escuro'].map(t => { const g = (c[t + '_banner_degrade'] || PAL[t][11]).split(',').map(x => x.trim()); return (t === 'claro' ? ':root' : ':root[data-theme="dark"]') + `{${K.map((k, i) => `--${V[i]}:${c[t + '_' + k] || PAL[t][i]}`).join(';')};--ban:linear-gradient(120deg,${g[0]},${g[1] || g[0]} 55%,${g[2] || g[1] || g[0]})}` }).join('') + `:root{--fh:'${c.fonte_titulo}',sans-serif;--fb:'${c.fonte_texto}',sans-serif;--r:${+c.raio_cards || 22}px}`;
             const st = document.createElement('style'); st.textContent = s; document.head.appendChild(st); const f = n => encodeURIComponent(n).replace(/%20/g, '+');
             const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `https://fonts.googleapis.com/css2?family=${f(c.fonte_titulo)}:wght@600;800&family=${f(c.fonte_texto)}:wght@400;600;700&display=swap`; document.head.appendChild(l);
-            if (c.favicon) { const i = document.createElement('link'); i.rel = 'icon'; i.href = img(c.favicon); document.head.appendChild(i) }
+            if (c.favicon) { let i = document.querySelector('link[rel="icon"]'); if (!i) { i = document.createElement('link'); i.rel = 'icon'; document.head.appendChild(i) } i.href = img(c.favicon) }
             let t = c.tema_padrao === 'escuro' ? 'dark' : 'light'; try { t = localStorage.getItem('ccf_tema') || t } catch (e) { } document.documentElement.dataset.theme = t
         }
         function route() {
