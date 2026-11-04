@@ -103,7 +103,7 @@ svg.i {
     left: 0;
     top: 0;
     bottom: 0;
-    width: 350px;
+    width: 250px;
     background: var(--card);
     border-right: 1px solid var(--line);
     padding: 22px 16px;
