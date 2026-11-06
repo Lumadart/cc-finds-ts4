@@ -18,12 +18,20 @@ const r=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?
 const d=rows.slice(1).filter(r=>r.some(x=>x.trim())).map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]||'').trim()])));try{sessionStorage.setItem(k,JSON.stringify({t:Date.now(),d}))}catch(e){}return d}
 let S={},GL={i:0,im:[]},CUR=location.hash.slice(1)||'/';
 function go(h){CUR=String(h).replace(/^#/,'')||'/';try{location.hash=CUR}catch(e){}route()}
+const mdN=s=>{const p=String(s||'').split('-');return p.length===2?(+p[0])*100+(+p[1]):null};
+function ativo(t,hoje){if(t.modo==='Sempre ligado')return true;if(t.modo!=='Automático')return false;
+ if(String(t.repete).toUpperCase()!=='NAO'){const a=mdN(t.inicio),b=mdN(t.fim);if(a==null||b==null)return false;const h=(hoje.getMonth()+1)*100+hoje.getDate();return a<=b?(h>=a&&h<=b):(h>=a||h<=b)}
+ const a=pd(t.inicio),b=pd(t.fim);if(!a||!b)return false;b.setHours(23,59,59);return hoje>=a&&hoje<=b}
+function pickTema(L){const f=new URLSearchParams(location.search).get('tema');L=(L||[]).filter(t=>t.id&&t.modo);let t=f?L.find(x=>x.id===f):null;const prev=!!t;
+ if(!t)t=L.filter(x=>ativo(x,new Date())).sort((a,b)=>(+b.prioridade||0)-(+a.prioridade||0))[0];return t?{t,prev}:null}
 function prep(r){const c={...DEF};r.Ajustes.forEach(x=>{if(x.chave&&x.valor!=='')c[x.chave]=x.valor});
+const pk=pickTema(r.Temas);let tema=null;if(pk){let ov={};try{ov=JSON.parse(pk.t.ajustes||'{}')}catch(e){}Object.keys(ov).forEach(k=>{if(typeof ov[k]==='string'&&ov[k]!=='')c[k]=ov[k]});
+ tema={id:pk.t.id,nome:pk.t.nome,efeito:String(pk.t.efeito||'').toLowerCase(),cores:split(pk.t.efeito_cores,',').filter(x=>/^#[0-9a-fA-F]{6}$/.test(x)),faixa:pk.t.faixa||'',prev:pk.prev}}
 const today=new Date();today.setHours(0,0,0,0);
 const cats=r.Categorias.filter(x=>!x.pertence_a).sort(oo).map(x=>({...x,subs:r.Categorias.filter(s=>s.pertence_a===x.nome).sort((a,b)=>ptc(a.nome,b.nome))}));
 const posts=r.CCs.filter(p=>p.status==='Publicado').map(p=>{p.imgs=split(p.imagens,'|');p.cover=p.imgs[0]||'';p.tg=split(p.tags,',');p.dt=pd(p.criado_em)||new Date(0);const dp=pd(p.data_publica);p.dp=dp;p.early=p.acesso==='Acesso antecipado'&&dp&&dp>today;p.members=p.acesso==='Apenas membros';p.days=p.early?Math.ceil((dp-today)/864e5):0;p.lk=mkLinks(p.links);return p}).sort((a,b)=>b.dt-a.dt||ptc(b.id,a.id));
 const A=r.Autores.map(a=>({...a,cor:a.cor||c.cor_destaque,lk:mkLinks(a.links)}));
-S={c,cats,posts,A,tags:r.Tags.sort((a,b)=>ptc(a.nome,b.nome)),LK:r.Links.sort((a,b)=>ptc(a.titulo,b.titulo)),CH:r.Cheats.sort((a,b)=>ptc(a.codigo,b.codigo)),TU:r.Tutoriais.sort((a,b)=>ptc(a.titulo,b.titulo)),today}}
+S={c,tema,cats,posts,A,tags:r.Tags.sort((a,b)=>ptc(a.nome,b.nome)),LK:r.Links.sort((a,b)=>ptc(a.titulo,b.titulo)),CH:r.Cheats.sort((a,b)=>ptc(a.codigo,b.codigo)),TU:r.Tutoriais.sort((a,b)=>ptc(a.titulo,b.titulo)),today}}
 const acc=p=>p.early?'Acesso antecipado':p.members?'Apenas membros':'Gratuito',cnt=n=>S.posts.filter(p=>p.autor===n).length;
 const catOf=n=>S.cats.find(c=>c.nome===n),subOf=(n,pai)=>{const c=catOf(pai);return c&&c.subs.find(s=>s.nome===n)};
 const lu=k=>S.c['luma_'+k]||'',pageImg=k=>S.c['img_banner_'+k]||'';
@@ -93,10 +101,30 @@ const R={'':home,explorar,autores,links,cheats,tutoriais,sobre};const o=a==='pos
 $('#app').innerHTML=o;if($('#gal'))gal(0,1);if(window.lucide)lucide.createIcons();
 document.querySelectorAll('.top a').forEach(x=>x.classList.toggle('on',x.dataset.r===a));
 document.querySelectorAll('#side a').forEach(x=>x.classList.toggle('on',(a===''&&x.dataset.k==='home')||(a==='explorar'&&q.get('cat')===x.dataset.k)));scrollTo(0,0)}
+const FXC={neve:['#ffffff','#dbeafe','#e0f2fe'],folhas:['#f97316','#d97706','#b45309','#a16207'],confete:['#f59e0b','#ef4444','#22c55e','#3b82f6','#a855f7','#ffffff']};
+const FX={on:false,raf:0,last:0,cv:null,ctx:null,parts:[],t:'',cores:[]};
+function fxMk(w,h,first){const t=FX.t,c=FX.cores[Math.floor(Math.random()*FX.cores.length)];const p={x:Math.random()*w,y:first?Math.random()*h:-20,c,s:0,vy:0,vr:0,a:.9,ph:Math.random()*6.28,rot:Math.random()*6.28};
+ if(t==='neve'){p.s=1.5+Math.random()*3;p.vy=.35+Math.random()*.9;p.a=.5+Math.random()*.4}else if(t==='folhas'){p.s=9+Math.random()*9;p.vy=.5+Math.random()*.8;p.vr=(Math.random()-.5)*.03;p.a=.85}else{p.s=5+Math.random()*4;p.vy=.8+Math.random()*1.2;p.vr=(Math.random()-.5)*.12}return p}
+function fxSize(){FX.cv.width=innerWidth;FX.cv.height=innerHeight}
+function fxLoop(ts){if(!FX.on)return;FX.raf=requestAnimationFrame(fxLoop);if(ts-FX.last<33)return;FX.last=ts;const x=FX.ctx,w=FX.cv.width,h=FX.cv.height;x.clearRect(0,0,w,h);
+ FX.parts.forEach((p,i)=>{p.ph+=.02;p.y+=p.vy;p.x+=Math.sin(p.ph)*(FX.t==='neve'?.4:.8);p.rot+=p.vr;if(p.y>h+20)FX.parts[i]=fxMk(w,h,false);x.globalAlpha=p.a;x.fillStyle=p.c;
+  if(FX.t==='neve'){x.beginPath();x.arc(p.x,p.y,p.s,0,6.283);x.fill()}else{x.save();x.translate(p.x,p.y);x.rotate(p.rot);
+   if(FX.t==='folhas'){x.beginPath();x.moveTo(0,-p.s);x.quadraticCurveTo(p.s*.8,-p.s*.2,0,p.s);x.quadraticCurveTo(-p.s*.8,-p.s*.2,0,-p.s);x.fill()}else x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}});x.globalAlpha=1}
+function fxStart(){if(FX.on)return;FX.on=true;fxSize();const n=Math.round(Math.min(70,Math.max(24,FX.cv.width/28)));FX.parts=Array.from({length:n},()=>fxMk(FX.cv.width,FX.cv.height,true));FX.cv.style.display='block';FX.raf=requestAnimationFrame(fxLoop)}
+function fxStop(){FX.on=false;cancelAnimationFrame(FX.raf);if(FX.ctx)FX.ctx.clearRect(0,0,FX.cv.width,FX.cv.height);FX.cv.style.display='none'}
+function temaUI(){const t=S.tema;if(!t)return;
+ if(t.faixa||t.prev){let skip=false;try{skip=!t.prev&&sessionStorage.getItem('ccf_faixa_'+t.id)==='1'}catch(e){}
+  if(!skip){const f=document.createElement('div');f.className='faixa';f.innerHTML='<span>'+esc((t.prev?'Pré-visualização do tema "'+t.nome+'". ':'')+t.faixa)+'</span>'+(t.prev?'':'<button type="button" aria-label="Fechar aviso">×</button>');document.querySelector('.page').prepend(f);
+   const b=f.querySelector('button');if(b)b.onclick=()=>{f.remove();try{sessionStorage.setItem('ccf_faixa_'+t.id,'1')}catch(e){}}}}
+ const reduz=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(!FXC[t.efeito]||reduz)return;
+ FX.t=t.efeito;FX.cores=t.cores.length?t.cores:FXC[t.efeito];FX.cv=$('#fx');FX.ctx=FX.cv.getContext('2d');addEventListener('resize',()=>{if(FX.on)fxSize()});
+ document.addEventListener('visibilitychange',()=>{if(!FX.on)return;if(document.hidden)cancelAnimationFrame(FX.raf);else FX.raf=requestAnimationFrame(fxLoop)});
+ const b=$('#fxb');let off=false;try{off=localStorage.getItem('ccf_fx')==='off'}catch(e){}
+ const apply=()=>{b.setAttribute('aria-pressed',off?'false':'true');b.classList.toggle('off',off);off?fxStop():fxStart()};b.hidden=false;b.onclick=()=>{off=!off;try{localStorage.setItem('ccf_fx',off?'off':'on')}catch(e){}apply()};apply()}
 //BOOT
-(async()=>{try{const r=SHEET_ID?Object.fromEntries(await Promise.all(['Ajustes','CCs','Autores','Categorias','Tags','Links','Cheats','Tutoriais'].map(async n=>[n,await sh(n)]))):window.CCF_DEMO;prep(r)}
+(async()=>{try{const r=SHEET_ID?Object.fromEntries(await Promise.all(['Ajustes','CCs','Autores','Categorias','Tags','Links','Cheats','Tutoriais','Temas'].map(async n=>{try{return [n,await sh(n)]}catch(e){if(n==='Temas')return [n,[]];throw e}}))):window.CCF_DEMO;prep(r)}
 catch(e){$('#app').innerHTML=`<main class="mg"><section class="card" style="grid-column:1/-1"><h2>Não consegui ler a planilha</h2><p>${SHEET_ID?'Confira o ID no index.html e se a planilha está compartilhada como "Qualquer pessoa com o link pode ver".':'Cole o ID da planilha no index.html (window.CCF_SHEET).'}</p></section></main>`;return}
-theme();side();if(window.lucide)lucide.createIcons();route();
+theme();side();temaUI();if(window.lucide)lucide.createIcons();route();
 addEventListener('hashchange',()=>{const n=location.hash.slice(1)||'/';if(n!==CUR){CUR=n;route()}});
 document.addEventListener('click',e=>{const T=e.target,bb=T.closest&&T.closest('.ddb');document.querySelectorAll('.dd.open').forEach(d=>{if(!bb||d!==bb.parentNode)d.classList.remove('open')});if(bb)bb.parentNode.classList.toggle('open');
 const hh=T.closest&&T.closest('button.acch');if(hh){const x=hh.parentNode;x.classList.toggle('open');hh.setAttribute('aria-expanded',x.classList.contains('open'))}
