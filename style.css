@@ -21,11 +21,11 @@ svg.i{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke
 .ic{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:50%;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;margin-left:6px;transition:border-color .2s}.ic:hover{border-color:var(--acc)}.ic svg{transition:transform .4s}.ic:active svg{transform:rotate(180deg)}
 #app{flex:1;display:flex;flex-direction:column}
 .mg{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px;padding:6px 28px 40px;flex:1;align-content:start;width:100%;animation:pgin .4s cubic-bezier(.2,.8,.2,1) backwards}.mg.b{grid-template-rows:auto 1fr}.mg.b .sd{grid-column:2;grid-row:1/span 3}.mg.b .ban{grid-column:1}.mg.b .rel{grid-row:3}@keyframes pgin{from{opacity:0;transform:translateY(10px)}}
-.ban{grid-column:1/-1;margin-top:34px;height:220px;border-radius:28px;color:var(--tx);position:relative;padding:0 40px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);background-color:var(--card)}.ban.nl{margin-top:8px;height:150px}
+.ban{grid-column:1/-1;margin-top:14px;height:200px;border-radius:28px;color:var(--tx);position:relative;padding:0 40px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);background-color:var(--card)}.ban.nl{margin-top:8px;height:150px}
 .ban>*{position:relative;z-index:1}.ban>.bg{position:absolute;inset:0;border-radius:inherit;overflow:hidden;z-index:0}.bg>div{position:absolute;inset:0}.bgi{background-size:cover;background-position:center}.ov{background:linear-gradient(90deg,rgba(0,0,0,.45),transparent 70%)}.ban:has(.bgi){color:#fff}
 .ban h1{font-size:34px}.ban p{margin:6px 0 12px;opacity:.92}.ban:not(.nl) p{max-width:min(720px,calc(100% - 380px))}.ban.nl p{max-width:900px}
 .pills{display:flex;gap:8px;flex-wrap:wrap}.pills span{background:color-mix(in srgb,var(--card) 70%,transparent);color:var(--tx);border:1px solid var(--line);padding:3px 12px;border-radius:99px;font-weight:700;font-size:13px}.pills b{color:var(--acc)}
-.luma{position:absolute!important;right:50px;bottom:0;height:250px;z-index:2!important;pointer-events:none}
+.luma{position:absolute!important;right:50px;bottom:0;height:100%;z-index:2!important;pointer-events:none}
 .avc{left:auto!important;width:520px}.avt{left:auto!important;width:340px;background-size:cover;background-position:center 20%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 55%);mask-image:linear-gradient(90deg,transparent,#000 55%)}
 .ini{left:auto!important;width:340px;display:grid;place-items:center;font:800 150px var(--fh);color:#fff;opacity:.35}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
