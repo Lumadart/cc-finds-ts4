@@ -41,7 +41,7 @@ if(o.av){const a=o.av;bg+=`<div class="avc" style="background:linear-gradient(90
 return `<section class="ban${o.luma?'':' nl'}"><div class="bg">${bg}</div><h1>${esc(o.t)}</h1>${o.p?`<p>${esc(o.p)}</p>`:''}<div class="pills">${(o.pills||[]).map(x=>`<span>${x}</span>`).join('')}</div>${o.btn?`<a class="bbtn" href="${o.btn[1]}">${esc(o.btn[0])}${ic('arrow-right')}</a>`:''}${lumaImg(o.luma,'luma')}</section>`}
 const ago=d=>{if(!d||!d.getTime())return '';const n=Math.floor((S.today-d)/864e5);return n<=0?'hoje':n===1?'há 1 dia':n<30?'há '+n+' dias':n<60?'há 1 mês':n<365?'há '+Math.floor(n/30)+' meses':'há mais de 1 ano'};
 const tagLbl=p=>p.early?ic('lock','width:13px;height:13px')+'Antecipado · '+p.days+'d':p.members?ic('lock','width:13px;height:13px')+'Só membros':esc(p.categoria+' · '+p.subcategoria);
-const avs=a=>`<span class="av" style="${a.avatar?bgs(a.avatar):'background:'+esc(a.cor||'#22B573')}">${a.avatar?'':esc((a.nome||'?').charAt(0).toUpperCase())}</span>`;
+const avs=(a,c)=>`<span class="av${c?' '+c:''}" style="${a.avatar?bgs(a.avatar):'background:'+esc(a.cor||'#22B573')}">${a.avatar?'':esc((a.nome||'?').charAt(0).toUpperCase())}</span>`;
 const card=(p,i)=>`<a class="cc" style="--i:${i||0}" href="#/post/${esc(p.id)}"><div class="th${p.cover?'':' pat'}" style="${bgs(p.cover)}"><span class="tag${p.early||p.members?' e':''}">${tagLbl(p)}</span>${p.favorito==='SIM'?`<span class="hrt" title="Favorito">${ic('heart')}</span>`:''}</div><div class="cb"><h3>${esc(p.titulo)}</h3><div class="cm">${avs(p.au||{nome:p.autor})}<span class="an">${esc(p.autor)}</span><span class="dt">${ago(p.dt)}</span></div></div></a>`;
 const grid=(L,c)=>`<div class="grid${c?' '+c:''}">${L.map(card).join('')||'<p style="color:var(--mut)">Nenhum CC encontrado.</p>'}</div>`;
 const chipsT=l=>`<div class="chips">${l.map(([t,u,on])=>`<a class="${on?'on':''}" href="${u}">${esc(t)}</a>`).join('')}</div>`;
@@ -49,13 +49,14 @@ const mg=(b,h,s,x)=>`<main class="mg${b?' b':''}">${h}${s}${x||''}</main>`;
 const secH=(t,ex,href)=>`<div class="sh"><h2><i class="dm"></i>${esc(t)}</h2>${ex||''}${href?`<a class="btn2" href="${href}">Ver mais ${ic('arrow-right')}</a>`:''}</div>`;
 const dd=(lab,cur,items)=>`<div class="dd"><button type="button" class="ddb"><span>${esc(cur||lab)}</span>${ic('chevron-down')}</button><div class="ddp">${items.map(([t,u,on])=>`<a href="${u}" class="${on?'on':''}">${esc(t)}</a>`).join('')}</div></div>`;
 const catTiles=()=>`<div class="cats">${S.cats.map(c=>`<a class="ct" href="#/explorar?cat=${encodeURIComponent(c.nome)}">${ic(c.icone||'folder')}<b>${esc(c.nome)}</b><small>${S.posts.filter(p=>p.categoria===c.nome).length} CCs</small></a>`).join('')}<a class="ct more" href="#/explorar">Ver tudo ${ic('arrow-right')}</a></div>`;
-const authCard=a=>`<a class="ac2" href="#/autor/${esc(a.id)}">${avs(a)}<div><b>${esc(a.nome)}</b><small>${cnt(a.nome)} CCs</small></div><span class="btn2">Ver CCs</span></a>`;
+const autTags=a=>{const P=S.posts.filter(p=>p.autor===a.nome),k={};P.forEach(p=>p.tg.forEach(t=>k[t]=(k[t]||0)+1));let l=Object.keys(k).sort((x,y)=>k[y]-k[x]||ptc(x,y)).slice(0,4);if(!l.length)l=[...new Set(P.map(p=>p.categoria))].slice(0,3);return l};
+const authCard=a=>`<a class="ac2" href="#/autor/${esc(a.id)}">${avs(a,'lg')}<div class="ab"><b>${esc(a.nome)}</b><p>${esc(autTags(a).join(' · '))||'&nbsp;'}</p></div>${a.favorito==='SIM'?`<span class="fv" title="Favorito">${ic('heart')}</span>`:''}<span class="btn3">Ver mais</span></a>`;
 function tagList(n){const k={};S.posts.forEach(p=>p.tg.forEach(t=>k[t]=(k[t]||0)+1));return Object.keys(k).sort((a,b)=>k[b]-k[a]||ptc(a,b)).slice(0,n)}
 function home(q){const P=S.posts,t=q.get('t')||'r';let L=t==='d'?P.filter(p=>p.destaque==='SIM'):t==='a'?P.filter(p=>p.early):P;
 const nov=P.filter(p=>(S.today-p.dt)/864e5<=+S.c.dias_novo).length,tg=tagList(14);
 return `<main class="wrap">${banner({t:S.c.titulo_home,p:S.c.texto_home,pills:[`<b>${P.length}</b> CCs`,`<b>${S.A.length}</b> autores`,`<b>${nov}</b> novos`],img:pageImg('home'),luma:lu('home'),btn:['Explorar o catálogo','#/explorar']})}${catTiles()}
 <section class="sec">${secH('Últimos CCs',chipsT([['Recentes','#/?t=r',t==='r'],['Destaques','#/?t=d',t==='d'],['Antecipado','#/?t=a',t==='a']]),'#/explorar')}${grid(L.slice(0,8))}</section>
-${S.A.length?`<section class="sec">${secH('Autores em destaque',null,'#/autores')}<div class="agrid">${[...S.A].sort((a,b)=>cnt(b.nome)-cnt(a.nome)).slice(0,4).map(authCard).join('')}</div></section>`:''}
+${S.A.length?`<section class="sec">${secH('Autores em destaque',null,'#/autores')}<div class="agrid">${[...S.A].sort((a,b)=>cnt(b.nome)-cnt(a.nome)).slice(0,6).map(authCard).join('')}</div></section>`:''}
 ${tg.length?`<section class="sec tg"><h3>Tags populares</h3>${chipsT(tg.map(x=>[x,'#/explorar?tag='+encodeURIComponent(x)]))}</section>`:''}</main>`}
 const emptyBox=()=>`<div class="empty">${lumaImg(lu('vazio'),'')}<h2>Nada por aqui…</h2></div>`;
 function explorar(q){const g=k=>q.get(k)||'',cat=g('cat'),sub=g('sub'),tg=q.getAll('tag'),fav=g('fav')==='1';
