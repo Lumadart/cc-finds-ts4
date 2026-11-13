@@ -12,24 +12,27 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<aside class="side" id="side"></aside>
 <div class="page">
-  <header class="top">
-    <a href="#/explorar" data-r="explorar">Explorar</a>
-    <a href="#/autores" data-r="autores">Autores</a>
-    <a href="#/links" data-r="links">Links úteis</a>
-    <a href="#/cheats" data-r="cheats">Cheats</a>
-    <a href="#/tutoriais" data-r="tutoriais">Tutoriais</a>
+  <header class="top"><div class="tin">
+    <a class="brand" href="#/"><b><i></i><span id="bn">CC Finds</span></b><small id="bs">por Luma</small></a>
+    <nav class="nav">
+      <a href="#/" data-r="">Início</a>
+      <a href="#/explorar" data-r="explorar">Explorar</a>
+      <a href="#/autores" data-r="autores">Autores</a>
+      <a href="#/links" data-r="links">Links úteis</a>
+      <a href="#/cheats" data-r="cheats">Cheats</a>
+      <a href="#/tutoriais" data-r="tutoriais">Tutoriais</a>
+    </nav>
     <label class="sr"><i data-lucide="search" class="i"></i><input id="q" placeholder="Buscar CC, autor ou tag" aria-label="Buscar"><kbd>/</kbd></label>
     <button class="ic" id="fxb" hidden title="Efeitos da estação (ligar/desligar)" aria-label="Efeitos da estação" aria-pressed="true"><i data-lucide="sparkles" class="i"></i></button>
     <button class="ic" id="th" aria-label="Alternar tema"><i data-lucide="sun-moon" class="i"></i></button>
-  </header>
+  </div></header>
   <div id="app"></div>
   <footer class="ft" id="ft"></footer>
 </div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="toast"></div>
-<!-- ID DA PLANILHA (o trecho da URL entre /d/ e /edit) -->
+<!-- COLE AQUI O ID DA PLANILHA (o trecho da URL entre /d/ e /edit) -->
 <script>window.CCF_SHEET='1tgI6xyL1Zq_DGLYWZI4vUL4ORjbHjlAivZuYevtVxX8';</script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.453.0/dist/umd/lucide.min.js"></script>
 <script src="app.js"></script>
