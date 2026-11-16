@@ -8,7 +8,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset
 svg.i{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .pat{background-color:var(--card);background-image:linear-gradient(120deg,var(--g1),var(--g2))}
 .page{min-height:100vh;display:flex;flex-direction:column}
-.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 70%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--line)}
 .tin{max-width:1680px;margin:0 auto;padding:0 28px;height:72px;display:flex;align-items:center;gap:8px}
 .brand{display:flex;flex-direction:column;margin-right:26px;min-width:150px}.brand b{font:800 26px/1 var(--fh);display:flex;gap:9px;align-items:center}.brand b i{width:20px;height:24px;background:var(--acc);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);display:inline-block}.brand small{color:var(--mut);font-size:12px;margin-left:29px}
 .nav{display:flex;gap:4px}.nav a{padding:8px 16px;border-radius:99px;font-weight:700;color:var(--mut);transition:background .2s,color .2s}.nav a{white-space:nowrap}.nav a:hover,.nav a.on{color:var(--acct)}
@@ -90,3 +90,5 @@ svg.i{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke
 .fv{position:absolute;top:14px;right:14px;color:var(--acc)}.fv svg{width:20px;height:20px;fill:currentColor}
 .af{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:14px}.cn{display:inline-flex;align-items:center;gap:7px;color:var(--mut);font-weight:700;font-size:14px}.cn svg{width:17px;height:17px;color:var(--acct)}
 .btn3{display:inline-flex;align-items:center;gap:6px;background:var(--acc);color:var(--on);font-weight:800;font-size:14px;padding:8px 18px;border-radius:12px;transition:filter .2s}.btn3 svg{width:16px;height:16px}.ac2:hover .btn3{filter:brightness(1.07)}
+
+.two .code{margin:0;min-width:0}.two .code span{min-width:0}
